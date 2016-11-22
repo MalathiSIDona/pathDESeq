@@ -51,7 +51,7 @@ dataset <- data.frame(subset(CRC.data,genes%in%Reactome.genes))
 
 #####**Step 3: Remove duplicate genes**
 
-It is required to remove rows with duplicate genes prior to the analysis.
+It is required to remove rows with duplicate gene names prior to the analysis.
 ```{r}
 #remove duplicate genes 
 dataset<-dataset[!duplicated(dataset$genes), ]
