@@ -14,13 +14,13 @@ vignette: >
 
 ### **Introduction**
 
-The package pathDESeq provides a method for differential expression analysis for RNA-Seq gene expression data using biological pathways and gene interaction network information. The statistical methodology is  based on a Poisson-Gamma-Beta Markov Random Field model to improve the sensitivity and specificity while reducing the false discovery rate [@DO16]. Parameter estimation are carried out using maximum likelihood and method of moment via Iterative Conditional Mode (ICM) algorithm. This package is suitable for RNA-Seq count or normalized gene expression data analysis. 
+The package pathDESeq provides a method for performing differential expression analysis of RNA-Seq data. The statistical methodology is based on a Poisson-Gamma-Beta Markov Random Field model. Prior knowledge of biological pathways and gene interaction network information is used to improve the sensitivity and specificity while reducing the false discovery rate [@DO16]. Parameter estimation is carried out using maximum likelihood and method of moment via Iterative Conditional Mode (ICM) algorithm. 
 
 ### **Input data and preparations**
-pathDESeq package requires normalized RNA-seq gene expression data (e.g., in FPKM or RPKM format) as its input. The gene expression data for *G* number of genes correspond to *m* replicates in the control group and *n* replicates in the treatment group, should be in the form of a rectangular table of *G X (m+n+1)*. The first column must contains the gene names. The next *m* columns must contain gene expression values for the control group and the last *n* columns must contain gene expression values for the treatment group. Each row represents the gene expression data for a particular gene, while  each column represents the gene expression data for a replicate. It is important that samples should be independent.  
+pathDESeq requires normalized RNA-seq gene expression data (e.g., in FPKM or RPKM format) as its input. The gene expression data for *G* number of genes correspond to *m* replicates in the control group and *n* replicates in the treatment group, should be in the form of a rectangular *G X (m+n+1)* matrix. The first column must contains the gene names. The next *m* columns must contain gene expression values for the control group and the last *n* columns must contain gene expression values for the treatment group. Each row represents the gene expression data for a particular gene, while each column represents the gene expression data for a replicate.  
 
 #####**Step 1: Load data gene expression data**
-Let's load a subset from a query data set for GSE50760 from NCBI database with RNA-Seq data in colorectal cancer(CRC) [@KI14]. This study aimed to identify prognostic indicators, including individual responses to chemotherapy, in CRC patients. RNA-Seq data was generated using 54 samples (normal colon, primary CRC, and liver metastases) from 18 colorectal cancer patients. All patients were treated at the Asian Medical Centre (Seoul, Korea) between May 2011 and February 2012 (AMC cohort). As a subset from the original data, this data set contains 54 samples with respect to 3000 genes.
+In this example, we start by loading a subset of GSE50760 dataset from NCBI database. This dataset comes from a study aimed to identify prognostic indicators, including individual responses to chemotherapy, in colorectal cancer (CRC) patients [@KI14]. The full RNA-Seq data consist of 54 samples (normal colon, primary CRC, and liver metastases) from 18 colorectal cancer patients. All patients were treated at the Asian Medical Centre (Seoul, Korea) between May 2011 and February 2012 (AMC cohort). As a subset from the original data, this data set contains 18 samples (9 normals and 9 primary CRC) and 3000 genes.
 ```{r}
 require("pathDESeq")
 data("CRC.data")
@@ -34,6 +34,7 @@ knitr::kable(CRC.data[1:3,1:5])
 #store gene names as another object
 gene.names<-CRC.data[,1]
 ```
+
 #####**Step 2: Select genes that can be found in Reactome pathways**
 
 In this analysis, we are interested in genes which can be found in Reactome pathways. Therefore it is required to filter the data set according to the available pathway information. The object "Reactome.genes" contains 7356 unique gene names which are in Reactome pathway database [@CR14]. However in general, any database which contains biological pathway information can be used to filter the genes.
@@ -46,74 +47,34 @@ data("Reactome.genes")
 
 #filtering data for selected genes which can be found in Reactome pathways.
 dataset <- data.frame(subset(CRC.data,genes%in%Reactome.genes))
-genes.selected<-dataset[,1]
-dataset.selected<-dataset[,-1]
 ```
 
 
-Once filtered it is required to subset the gene expression data in to two independent groups.  
-```{r}
-#separating dataset in to two independent groups as control and treatment
-# This data set was generated using 54 samples (normal colon, primary CRC, 
-#and liver metastases) from 18 colorectal cancer patients. 
-#Here we select only two independent groups each with 9 patients.
-#dataset 1 : samples obtained from 9 patients for normal colon as control group
-#dataset 2 : samples obtained from 9 patients for primary CRC as treatment group
-dataset1<-dataset.selected[,1:9]
-dataset2<-dataset.selected[,28:36]
-
-#creating a data frame with selected dataset
-#selected.dataset= RNA-Seq gene expression data for 2 groups with their gene names
-selected.dataset<-data.frame(genes.selected,dataset1,dataset2)
-
-```
 #####**Step 3: Remove duplicate genes**
 
-It is required to remove rows with duplicate gene names.
+It is required to remove rows with duplicate genes pior to the analysis.
 ```{r}
-#remove duplicate genes and create "selected.dataset.1" which cantains gene expression data for unique genes. 
-selected.dataset.1<-selected.dataset[!duplicated(selected.dataset$genes.selected), ]
+#remove duplicate genes 
+dataset<-dataset[!duplicated(dataset$genes), ]
 ```
 
-#####**Step 4: Remove rows with NA's**
+#####**Step 4: Remove rows with missing values**
 
-It is required to remove rows with NA's if there any. 
+Rows (genes) with missing expression values need to be removed.
 ```{r}
-# create an object with gene expression data
-data <- selected.dataset.1[, -1]
-row.has.na <- apply(data, 1, function(x){any(is.na(x))})
-#how many rows has N/A term
-sum(row.has.na)
-#create a data frame "selected.dataset.2" after removing rows with "N/A"
-selected.dataset.2<- selected.dataset.1[!row.has.na,]
+row.has.na <- apply(dataset, 1, function(x){any(is.na(x))})
+dataset<- dataset[!row.has.na,]
 ```
 
 
 #####**Step 5: Remove rows with all 0's**
 
-It is required to remove rows with with all 0's 
+It is required to remove genes (rows) with all 0's 
 ```{r}
-# remove rows with all 0's 
-data<-selected.dataset.2[,-1]
-row_sub <- rowSums(data) > 0
-data <- data[row_sub, ]
-
-# #create a data frame "dataset.final" after removing rows with all 0's
-dataset.final <- selected.dataset.2[row_sub, ]
-dim(dataset.final)
+# remove genes with all 0's 
+dataset <- dataset[rowSums(dataset[,-1])>0,]
+dim(dataset)
 ```
-Let's store the data for the PGBMRF analysis
-
-```{r}
-#store gene names as an object
-genes<-dataset.final[,1]
-
-#store gene expression data as an object
-data<-dataset.final[,-1]
-
-```
-
-
 
 ###**Perform PGBMRF analysis using ICM algorithm**
 
@@ -125,6 +86,7 @@ data<-dataset.final[,-1]
 data("BioGRID.table")
 head(BioGRID.table)
 ```
+
 The object "BioGRID.table" contains 237045 gene-gene interactions retrieved from BioGRID database version 3.4.129  [@CH15].
 The object contains two variables "Gene.1" and "Gene.2". Gene.1 repesents the official gene symbol for Interacting Partner A and Gene.2 represents the 
 official gene symbol for Interacting Partner B. Each row is a gene-gene interaction pair.
@@ -149,22 +111,19 @@ The **pgbmrfICM** function is a wrapper function which consists functions to per
 
 1. selected dataset.txt : the gene expression dataset used for the PGBMRF analysis
 
-2. ttest result.txt     : a table for t-test results
+2. neib_matrix.txt      : the neighbourhood matrix
 
-3. neib_matrix.txt      : the neighbourhood matrix
+3. PGBMRF identified UR genes.txt : UR genes identified by PGBMRF model
 
-4. PGBMRF identified UR genes.txt : UR genes identified by PGBMRF model
+4. PGBMRF identified DR genes.txt : DR genes identified by PGBMRF model
 
-5. PGBMRF identified DR genes.txt : DR genes identified by PGBMRF model
+5. PGBMRF states.txt    : the final estimated DE states
 
-6. PGBMRF states.txt    : the final estimated DE states
-
-7. PGBMRF results.txt   : a summary table for the PGBMRF analysis.
+6. PGBMRF results.txt   : a summary table for the PGBMRF analysis.
 
 Let's use **pgbmtfICM** function to perform the analysis with following arguments.
 
-* _genes_         :A data frame of gene names considered for the analysis
-* _data_          :A data frame which consists of the gene expression data. 
+* _data_          :A data frame which consists of the gene expression data. The first column must contains gene names. 
 * _interactions_  :A data frame contains gene interaction information.
 * _m_             : Number of replicates for the control group.
 * _n_             : Number of replicates for the treatment group.
@@ -175,9 +134,8 @@ Let's use **pgbmtfICM** function to perform the analysis with following argument
 #User can change initial model parameters, the level of significance, the appropriate number of 
 #- Gaussian quadrature points(k) and the maximum number of ICM iterations for the best performance.
 
-#pgbmrfICM(data=data,genes=genes,m=9,n=9,interactions=BioGRID.table)
+#pgbmrfICM(data=dataset,m=9,n=9,interactions=BioGRID.table)
 
 ```
-
 
 ###References
