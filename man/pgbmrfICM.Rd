@@ -13,14 +13,13 @@ Function to perform PGBMRF model
 (c) Estimating DE states for given PGBMRF model parameters.
 }
 \usage{
-pgbmrfICM(genes,data,interactions,m,n,sig=0.05,
+pgbmrfICM(data,interactions,m,n,sig=0.05,
   k=40,pgb.start=c(log(10),log(0.2),log(2),log(3)),iterations=12)
 }
 %- maybe also 'usage' for other objects documented here.
 
 \arguments{
-  \item{genes}{A vector of gene names considered for the analysis}
-  \item{data}{A data frame which consists of the gene expression data. First m columns correspond to the control group and next n columns correspond to the treatment group. Each row represents the gene expression data for a particular gene.}
+  \item{data}{A data frame which consists of the gene expression data. The first column must contains gene names. The next m columns must contain gene expression values for the control group and the last n columns must contain gene expression values for the treatment group. Each row represents the gene expression data for a particular gene, while each column represents the gene expression data for a replicate. }
   \item{interactions}{A data frame contains gene interaction information.
 
 	Column 1 represents the official gene symbol for interacting partner A.
@@ -29,7 +28,6 @@ pgbmrfICM(genes,data,interactions,m,n,sig=0.05,
 
  	Each row is a gene-gene interaction pair.
 }
-
   \item{m}{Number of replicates for the control group.}
   \item{n}{Number of replicates for the treatment group.}
   \item{sig}{ The level of significance. The default value is 0.05. }
@@ -79,13 +77,6 @@ Besag, J. (1986). On the statistical analysis of dirty pictures. Journal of the 
 #- for a particular gene.
 data("data1065")
 
-#store gene names
-genes<-data1065[,1]
-
-#store gene expresssion data
-data<-data1065[,-1]
-
-
 #Here we use BioGRID gene interaction information
 #A data frame with 270,970 rows with 2 columns.
 #"Gene.1"=Official gene symbol for interacting partner A
@@ -94,7 +85,7 @@ data("BioGRID.table")
 
 #perform pgbmrf analysis with default parameter values for sig, k, pgb.start
 #-and iterations
-pgbmrfICM(genes=genes,data=data,interactions=BioGRID.table,m=10,n=10)
+pgbmrfICM(data=data1065,interactions=BioGRID.table,m=10,n=10)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

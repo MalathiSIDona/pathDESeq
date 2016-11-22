@@ -1,5 +1,7 @@
-pgbmrfICM<-function(genes,data,interactions,m,n,sig=0.05,k=40,pgb.start=c(log(10),log(0.2),log(2),log(3)),iterations=12){
-
+pgbmrfICM<-function(data,interactions,m,n,sig=0.05,k=40,pgb.start=c(log(10),log(0.2),log(2),log(3)),iterations=12){
+  genes<-data[,1]
+  data<-data[,-1]
+  cat("The entries in the first column will consider as gene names.","\n")
   t.results<-ttest(data=data,m=m,n=n,sig=sig)
   tval<-t.results[,1]
   pval<-t.results[,2]
@@ -38,7 +40,7 @@ pgbmrfICM<-function(genes,data,interactions,m,n,sig=0.05,k=40,pgb.start=c(log(10
   cat(paste(length(selected.Reactome.genes)," genes were selected for the PGBMRF analysis."),"\n")
   #save as a character vector
   selected.Reactome.genes<-as.character(selected.Reactome.genes)
-  cat(paste("Creating the neigbourhood matrix...."),"\n")
+  cat(paste("* Creating the neigbourhood matrix...."),"\n")
   neib.matrix<-neibMat(pathway.genes=selected.Reactome.genes,interactions=interactions)
 
   #assing t.states as initial DE states for genes
@@ -76,7 +78,7 @@ pgbmrfICM<-function(genes,data,interactions,m,n,sig=0.05,k=40,pgb.start=c(log(10
     #parameter_estimates1[3] = MOM estimate for a
     #parameter_estimates1[4] = MOM estimate for b
 
-    cat(paste('Running ICM iteration',(nrow(result)),"...",sep=" "),"\n")
+    cat(paste('* Running ICM iteration',(nrow(result)),"...",sep=" "),"\n")
     #step 1: parameter estimation for PGB using MOM
     parameter_estimates1<-pgbEst(data=data,state=state,m=m,n=n)
     #print(parameter_estimates1)
