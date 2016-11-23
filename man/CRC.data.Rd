@@ -4,7 +4,7 @@
 \title{
 A RNA-Seq gene expression data set for colorectal cancer}
 \description{
-This dataset comes from a study aimed to identify prognostic indicators, including individual responses to chemotherapy, in colorectal cancer (CRC) patients (Kim,2014). The full RNA-Seq data consist of 54 samples (normal colon, primary CRC, and liver metastases) from 18 colorectal cancer patients. All patients were treated at the Asian Medical Centre (Seoul, Korea) between May 2011 and February 2012 (AMC cohort). As a subset from the original data, this data set contains 18 samples (9 normals and 9 primary CRC) and 3000 genes.
+This dataset comes from a study aimed to identify prognostic indicators, including individual responses to chemotherapy, in colorectal cancer (CRC) patients (Kim,2014). The full RNA-Seq data consist of 54 samples (normal colon, primary CRC, and liver metastases) from 18 colorectal cancer patients. All patients were treated at the Asian Medical Centre (Seoul, Korea) between May 2011 and February 2012 (AMC cohort). As a subset from the original data, this data set contains 18 samples (9 normals and 9 primary CRC) and 2000 genes.
 }
 \usage{data("CRC.data")}
 \format{
