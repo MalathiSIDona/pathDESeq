@@ -124,7 +124,7 @@ Let's use **pgbmtfICM** function to perform the analysis with following argument
 
 #User can change initial model parameters, the level of significance, the appropriate number of 
 #- Gaussian quadrature points(k) and the maximum number of ICM iterations for the best performance.
-#Parameter estimates are bit unconverge for small datasets but the ICM algorithm convergence is 
+#Parameter estimates will be bit unconverged for small datasets but the ICM algorithm convergence is 
 #- determined by the convergence of estimated DE states.
 
 #pgbmrfICM(data=dataset,interactions=BioGRID.table,m=9,n=9)
