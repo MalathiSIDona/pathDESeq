@@ -30,23 +30,16 @@ The format of the data set should be like this,
 knitr::kable(CRC.data[1:3,1:5])
 ```
 
-```{r}
-#store gene names as another object
-gene.names<-CRC.data[,1]
-```
-
 #####**Step 2: Select genes that can be found in Reactome pathways**
 
-In this analysis, we are interested in genes which can be found in Reactome pathways. Therefore it is required to filter the data set according to the available pathway information. The object "Reactome.genes" contains 7356 unique gene names which are in Reactome pathway database [@CR14]. However in general, any database which contains biological pathway information can be used to filter the genes.
-
-For the pathway information, it is required to load the Reactome pathway gene list from the package.
+We will restrict our analysis to genes which can be found in Reactome pathways. Therefore it is required to filter the data set according to the available pathway information. The object "Reactome.genes" contains 7356 unique gene names which are in Reactome pathway database [@CR14]. However in general, any database which contains biological pathway information can be used to filter the genes.
 
 ```{r}
 # call the object "Reactome.genes" 
 data("Reactome.genes")
 
 #filtering data for selected genes which can be found in Reactome pathways.
-dataset <- data.frame(subset(CRC.data,genes%in%Reactome.genes))
+dataset <- data.frame(subset(CRC.data,CRC.data$genes%in%Reactome.genes))
 ```
 
 #####**Step 3: Remove duplicate genes**
@@ -61,8 +54,7 @@ dataset<-dataset[!duplicated(dataset$genes), ]
 
 Rows (genes) with missing expression values need to be removed.
 ```{r}
-row.has.na <- apply(dataset, 1, function(x){any(is.na(x))})
-dataset<- dataset[!row.has.na,]
+dataset<-dataset[rowSums(is.na(dataset))==0,]
 ```
 
 
@@ -132,6 +124,8 @@ Let's use **pgbmtfICM** function to perform the analysis with following argument
 
 #User can change initial model parameters, the level of significance, the appropriate number of 
 #- Gaussian quadrature points(k) and the maximum number of ICM iterations for the best performance.
+#Parameter estimates are bit unconverge for small datasets but the ICM algorithm convergence is 
+#- determined by the convergence of estimated DE states.
 
 #pgbmrfICM(data=dataset,interactions=BioGRID.table,m=9,n=9)
 

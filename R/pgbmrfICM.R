@@ -1,7 +1,7 @@
 pgbmrfICM<-function(data,interactions,m,n,sig=0.05,k=40,pgb.start=c(log(10),log(0.2),log(2),log(3)),iterations=12){
   genes<-data[,1]
   data<-data[,-1]
-  cat("The entries in the first column will consider as gene names.","\n")
+  cat("The entries in the first column will be assumed to contain gene names.","\n")
   t.results<-ttest(data=data,m=m,n=n,sig=sig)
   tval<-t.results[,1]
   pval<-t.results[,2]
@@ -161,6 +161,6 @@ pgbmrfICM<-function(data,interactions,m,n,sig=0.05,k=40,pgb.start=c(log(10),log(
   DR.genes <- selected.Reactome.genes[state == -1]
   write.table(UR.genes, "PGBMRF identified UR genes.txt",quote = FALSE, row.names = FALSE,col.names = FALSE)
   write.table(DR.genes, "PGBMRF identified DR genes.txt",quote = FALSE, row.names = FALSE,col.names = FALSE)
-  cat(paste('See ',getwd()," for details.",sep=" "),"\n")
+  cat(paste('See ',getwd()," for more detailed outputs.",sep=" "),"\n")
 
 }
