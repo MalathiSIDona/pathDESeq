@@ -22,8 +22,8 @@ pathDESeq requires normalized RNA-seq gene expression data (e.g., in FPKM or RPK
 #####**Step 1: Load data gene expression data**
 In this example, we start by loading a subset of GSE50760 dataset from NCBI database. This dataset comes from a study aimed to identify prognostic indicators, including individual responses to chemotherapy, in colorectal cancer (CRC) patients [@KI14]. The full RNA-Seq data consist of 54 samples (normal colon, primary CRC, and liver metastases) from 18 colorectal cancer patients. All patients were treated at the Asian Medical Centre (Seoul, Korea) between May 2011 and February 2012 (AMC cohort). As a subset from the original data, this data set contains 18 samples (9 normals and 9 primary CRC) and 3000 genes.
 ```{r}
-require("pathDESeq")
-data("CRC.data")
+require(pathDESeq)
+data(CRC.data)
 ```
 The format of the data set should be like this,
 ```{r, echo=FALSE, results='asis'}
@@ -36,7 +36,7 @@ We will restrict our analysis to genes which can be found in Reactome pathways. 
 
 ```{r}
 # call the object "Reactome.genes" 
-data("Reactome.genes")
+data(Reactome.genes)
 
 #filtering data for selected genes which can be found in Reactome pathways.
 dataset <- data.frame(subset(CRC.data,CRC.data$genes%in%Reactome.genes))
@@ -74,7 +74,7 @@ dim(dataset)
 
 
 ```{r}
-data("BioGRID.table")
+data(BioGRID.table)
 head(BioGRID.table)
 ```
 
@@ -124,8 +124,8 @@ Let's use **pgbmtfICM** function to perform the analysis with following argument
 
 #User can change initial model parameters, the level of significance, the appropriate number of 
 #- Gaussian quadrature points(k) and the maximum number of ICM iterations for the best performance.
-#Parameter estimates will be bit unconverged for small datasets but the ICM algorithm convergence is 
-#- determined by the convergence of estimated DE states.
+#Note that with small datasets we expect the beta estimates to be a bit unstable but the ICM algorithm 
+#- convergence is determined by the convergence of estimated DE states.
 
 #pgbmrfICM(data=dataset,interactions=BioGRID.table,m=9,n=9)
 
