@@ -114,8 +114,8 @@ The **pgbmrfICM** function is a wrapper function which consists functions to per
 
 Let's use **pgbmtfICM** function to perform the analysis with following arguments.
 
-* _data_          :A data frame which consists of the gene expression data. The first column must contains gene names. 
-* _interactions_  :A data frame contains gene interaction information.
+* _data_          : A data frame which consists of the gene expression data. The first column must contains gene names. 
+* _interactions_  : A data frame contains gene interaction information.
 * _m_             : Number of replicates for the control group.
 * _n_             : Number of replicates for the treatment group.
 
